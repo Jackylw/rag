@@ -10,7 +10,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 import config_data
 import hashlib
-from langchain_community.embeddings import DashScopeEmbeddings
+import datetime
 
 
 def _ensure_md5_dir():
@@ -48,7 +48,7 @@ def get_string_md5(input_str: str, encoding='utf-8') -> str:
 
 
 class KnowledgeBaseService:
-    """知识库服务类，用于管理知识库的上传和检索"""
+    """知识库服务类，用于管理知识库的上传"""
 
     def __init__(self) -> None:
         Path(config_data.persist_directory).mkdir(parents=True, exist_ok=True)  # 确保数据库文件存储路径存在
@@ -61,18 +61,40 @@ class KnowledgeBaseService:
             chunk_size=config_data.chunk_size,  # 每个文档分块的最大字符数
             chunk_overlap=config_data.chunk_overlap,  # 分块之间的重叠字符数
             separators=config_data.separators,  # 用于分割文本的分隔符列表
+            length_function=len  # 计算文本长度的函数，这里使用内置的len函数
         )
 
-    def upload_by_str(self, data: str, filename: str) -> None:
+    def upload_by_str(self, data: str, filename: str) -> str:
         """
         上传字符串到知识库
 
         :param data: 要上传的文本数据
         :param filename: 文件名
         """
-        pass  # TODO: 实现上传逻辑
+        md5_hex = get_string_md5(data)
+        if check_md5(md5_hex):
+            return "[跳过]内容已经存在在知识库中"
+        # 对文本进行分块
+        if len(data) > config_data.split_char_len:
+            knowledge_chunks = self.splitter.split_text(data)
+        else:
+            knowledge_chunks = [data]
+        # 元数据
+        metadata = {
+            "source": filename,
+            # 20xx-xx-xx xx:xx:xx
+            "datatime": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "operator": "admin",
+        }
+        self.chroma.add_texts(
+            texts=knowledge_chunks,
+            metadatas=[metadata for _ in knowledge_chunks]
+        )
+        save_md5(md5_hex)
+        return "[成功]知识库上传成功"
 
 
 if __name__ == "__main__":
-    print(save_md5(get_string_md5("hello world")))
-    print(check_md5(get_string_md5("hello world")))
+    service = KnowledgeBaseService()
+    r = service.upload_by_str("这是一个测试文本", "test2.txt")
+    print(r)
