@@ -36,6 +36,8 @@ class FileChatMessageHistory(BaseChatMessageHistory):
             with open(self.file_path, "r", encoding="utf-8") as f:
                 messages = json.load(f)
                 return messages_from_dict(messages)
+        except json.JSONDecodeError:
+            return []
         except FileNotFoundError:
             return []
 
@@ -44,5 +46,4 @@ class FileChatMessageHistory(BaseChatMessageHistory):
         if os.path.exists(self.file_path):
             with open(self.file_path, "w", encoding="utf-8") as f:
                 json.dump([], f)
-
 

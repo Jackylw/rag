@@ -71,6 +71,8 @@ class KnowledgeBaseService:
         :param data: 要上传的文本数据
         :param filename: 文件名
         """
+        if not data or not data.strip():
+            return "[失败]上传内容为空，无法入库"
         md5_hex = get_string_md5(data)
         if check_md5(md5_hex):
             return "[跳过]内容已经存在在知识库中"
@@ -90,6 +92,7 @@ class KnowledgeBaseService:
             texts=knowledge_chunks,
             metadatas=[metadata for _ in knowledge_chunks]
         )
+        self.chroma.persist()
         save_md5(md5_hex)
         return "[成功]知识库上传成功"
 
