@@ -1,6 +1,6 @@
 import streamlit as st
-from uuid import uuid4
 
+import config_data
 from rag import RagService
 
 st.set_page_config(page_title="智能客服", page_icon="🤖")
@@ -12,11 +12,6 @@ if "messages" not in st.session_state:
     st.session_state["messages"] = [
         {"role": "assistant", "content": "你好，我是智能客服，有什么问题我可以帮助你吗？"}
     ]
-
-if "session_config" not in st.session_state:
-    st.session_state["session_config"] = {
-        "configurable": {"session_id": f"session_{uuid4()}"}
-    }
 
 if "rag_service" not in st.session_state:
     st.session_state["rag_service"] = RagService()
@@ -39,7 +34,7 @@ if prompt := st.chat_input("请输入你的问题..."):
         response = st.write_stream(
             st.session_state["rag_service"].chain.stream(
                 {"question": prompt},
-                config=st.session_state["session_config"],
+                config=config_data.session_config,
             )
         )
 

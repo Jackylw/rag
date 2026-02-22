@@ -92,7 +92,6 @@ class KnowledgeBaseService:
             texts=knowledge_chunks,
             metadatas=[metadata for _ in knowledge_chunks]
         )
-        self.chroma.persist()
         save_md5(md5_hex)
         return "[成功]知识库上传成功"
 
