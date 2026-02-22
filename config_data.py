@@ -21,3 +21,9 @@ retriever_k = 2  # 每次检索返回的文档数量
 
 # md5记录文件路径，用于记录已上传文档的md5值，避免重复上传
 md5_path = "./data/md5_records.txt"
+
+session_config = {
+        "configurable": {
+            "session_id": "user_001"
+        }
+    }
