@@ -1,12 +1,13 @@
 # Chroma数据库配置
 from langchain_community.embeddings import DashScopeEmbeddings
 
+# chroma数据库配置
 collection_name = "knowledge_rag"
-embedding_function = DashScopeEmbeddings(
+embedding_function = DashScopeEmbeddings( # 嵌入模型选择
     model="text-embedding-v4"
 )
-chat_model = "qwen3-max-preview"
-persist_directory = "./data/chroma_db"
+chat_model = "qwen3-max-preview" # 对话大模型选择
+persist_directory = "./data/chroma_db" # chroma数据库文件存储路径
 
 # RecursiveCharacterTextSplitter配置
 chunk_size = 1000  # 每个文档分块的最大字符数
